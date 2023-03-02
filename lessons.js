@@ -53,3 +53,6 @@ sayhello();
 addnumber(10,30);
 const result = saymyname("daniel",18);
 console.log(result);
+
+
+console.log("wow git hub is amazing")
