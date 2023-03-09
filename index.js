@@ -1,12 +1,12 @@
 import express from "express";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 
-const port=4090;
+const port=process.env.PORT;
 
-app.listen(port);
-
-
+app.listen(port,()=>{console.log(`the server is runing on port ${port}`)});
 
 
 
@@ -14,4 +14,5 @@ app.listen(port);
 
 
 
-console.log("wow")
+
+console.log("you ave nice")
