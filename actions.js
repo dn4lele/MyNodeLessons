@@ -40,7 +40,7 @@ router.post('/calcSal',(req,res)=>{
     payPerExtraHour=parseInt(payPerExtraHour);
     tax=parseInt(tax);
 
-    if(workingHours>180)
+    
 
 
     return res.status(200).json({
