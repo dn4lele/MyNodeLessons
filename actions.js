@@ -1,7 +1,7 @@
 import  express  from "express";
 const router=express.Router();
-
-
+import Jwt from "jsonwebtoken";
+import bcryptjs from "bcryptjs";
 
 router.get('/sayhello',(req,res)=>{
     return res.status(200).json({
@@ -30,23 +30,83 @@ router.post('/calcSal',(req,res)=>{
     const payPerHour=req.body.payPerHour;
     const payPerExtraHour=req.body.payPerExtraHour;
     const tax=req.body.tax;
-    */
+   */
 
     //option 2
     const{workingHours,payPerHour,payPerExtraHour,tax}=req.body;
     let pay=0;
-    workingHours=parseInt(workingHours);
-    payPerHour=parseInt(payPerHour);
-    payPerExtraHour=parseInt(payPerExtraHour);
-    tax=parseInt(tax);
-
-    
 
 
+    let normalhours=workingHours-180;
+    pay=normalhours*payPerHour;
+    let extrahour=workingHours-180;
+    pay+=extrahour*payPerExtraHour;
+
+    let presenttax=(100-tax)/100;
+    pay=pay*presenttax;
+     
     return res.status(200).json({
-        message:`hello ${workingHours} ${payPerHour} ${payPerExtraHour} ${tax}  \n 180 must and more is extra`
+        message:`your payment is: ${pay}`
         
     })
+
+})
+
+
+//lesson 4
+let user=[]
+
+router.post('/register',async(req,res)=>{
+
+    const{firstname,lastname,email,password}=req.body;
+
+    const hash_pawwword=await bcryptjs.hash(password,10);
+
+    const _user={
+        firstname:firstname,
+        lastname:lastname,
+        email:email,
+        password:hash_pawwword
+    }
+     
+    user.push(_user);
+    
+    return res.status(200).json({
+        message:user
+        
+    })
+
+})
+
+
+router.post('/login',async(req,res)=>{
+
+    const{email,password}=req.body;
+
+    const account=user.find(x=> x.email == email)
+    if(account){
+        const isMatch=await bcryptjs.compare(password,account.password);
+        if(isMatch){
+            return res.status(200).json({
+                message:"OK"
+                
+            })
+        }
+        else{
+            return res.status(401).json({
+                message:"not the right password"
+                
+            })
+        }
+    }
+
+    else{
+        return res.status(200).json({
+            message:"user not found"
+            
+        })
+    }
+    
 
 })
 
