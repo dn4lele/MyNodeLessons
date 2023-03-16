@@ -2,6 +2,8 @@ import  express  from "express";
 const router=express.Router();
 import Jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
+import Auth from './auth.js';
+
 
 router.get('/sayhello',(req,res)=>{
     return res.status(200).json({
@@ -82,32 +84,63 @@ router.post('/register',async(req,res)=>{
 router.post('/login',async(req,res)=>{
 
     const{email,password}=req.body;
+    try {
+        const account=user.find(x=> x.email == email)
+        if(account){
+            const isMatch=await bcryptjs.compare(password,account.password);
+            if(isMatch){
 
-    const account=user.find(x=> x.email == email)
-    if(account){
-        const isMatch=await bcryptjs.compare(password,account.password);
-        if(isMatch){
-            return res.status(200).json({
-                message:"OK"
-                
-            })
+                const datatotoken={
+                    email:account.email,
+                    firstname:account.firstname,
+                    lastname:account.lastname,
+                }
+
+                const token = await Jwt.sign(datatotoken,process.env.JWT_KEY ,{expiresIn:'30d'});
+
+
+
+                return res.status(200).json({
+                    message:"OK",
+                    token:token,
+                    
+                })
+            }
+            else{
+                return res.status(401).json({
+                    message:"not the right password"
+                    
+                })
+            }
         }
+    
         else{
-            return res.status(401).json({
-                message:"not the right password"
+            return res.status(200).json({
+                message:"user not found"
                 
             })
         }
-    }
-
-    else{
-        return res.status(200).json({
-            message:"user not found"
+    } catch (error) {
+        return res.status(500).json({
+            message:"ERROR FROM SERVER:"+error
             
         })
     }
+   
     
 
+})
+
+
+
+//lesson 5
+
+
+router.get('/getData' , Auth  , async(req,res)=>{
+    return res.status(200).json({
+        message:"OK "+req.newdata,
+        
+    })
 })
 
 
