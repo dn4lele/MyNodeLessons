@@ -3,6 +3,7 @@ const router=express.Router();
 import Jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 import Auth from './auth.js';
+import Account from "./models/account.js";
 
 
 router.get('/sayhello',(req,res)=>{
@@ -54,29 +55,52 @@ router.post('/calcSal',(req,res)=>{
 
 })
 
+//MVC modle view controller
+
+
+
+
 
 //lesson 4
 let user=[]
 
 router.post('/register',async(req,res)=>{
 
-    const{firstname,lastname,email,password}=req.body;
+    const{firstname,lastname,email,password,avatar}=req.body;
 
     const hash_pawwword=await bcryptjs.hash(password,10);
 
-    const _user={
-        firstname:firstname,
-        lastname:lastname,
-        email:email,
-        password:hash_pawwword
+    //chack if there is one username
+    const account=await Account.findAll({where:{email:email}});
+
+    if(account.length == 1){
+        return res.status(200).json({
+            message:"Email already in use"
+        })
     }
-     
-    user.push(_user);
-    
-    return res.status(200).json({
-        message:user
-        
-    })
+    else{
+        Account.create({
+            firstname:firstname,
+            lastname:lastname,
+            email:email,
+            pass:hash_pawwword,
+            avatar:avatar,
+            isApprove:false,
+            code:generateRandomIntegerInRange(1000,9999)
+        })
+        .then(accoun_created =>
+            {
+            return res.status(200).json({
+            message:accoun_created
+        })})
+        .catch(error =>{
+            return res.status(500).json({
+                message:error.message
+            })
+        })
+    }
+
+
 
 })
 
@@ -143,5 +167,9 @@ router.get('/getData' , Auth  , async(req,res)=>{
     })
 })
 
+
+function generateRandomIntegerInRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 export default router;
