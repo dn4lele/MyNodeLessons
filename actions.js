@@ -4,6 +4,39 @@ import Jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 import Auth from './auth.js';
 import Account from "./models/account.js";
+import Products from './models/Products.js';
+
+
+
+router.post('/shop' , Auth  , async(req,res)=>{
+
+
+    const{name,price,image}=req.body;
+    
+    Products.create({
+        name:name,
+        price:price,
+        image:image,
+        publisherId:req.user.id,
+    })
+    .then(account_created =>
+        {
+        return res.status(200).json({
+        message:account_created
+    })})
+    .catch(error =>{
+        return res.status(500).json({
+            message:error.message
+        })
+    })
+
+
+})
+
+
+
+
+
 
 
 router.get('/sayhello',(req,res)=>{
@@ -109,15 +142,16 @@ router.post('/login',async(req,res)=>{
 
     const{email,password}=req.body;
     try {
-        const account=user.find(x=> x.email == email)
-        if(account){
-            const isMatch=await bcryptjs.compare(password,account.password);
+        const account=await Account.findAll({where:{email:email}});
+        if(account.length == 1){
+            const acc=account[0];
+            const isMatch=await bcryptjs.compare(password,acc.pass);
             if(isMatch){
-
                 const datatotoken={
-                    email:account.email,
-                    firstname:account.firstname,
-                    lastname:account.lastname,
+                    id:acc.id,
+                    email:acc.email,
+                    firstname:acc.firstname,
+                    lastname:acc.lastname,
                 }
 
                 const token = await Jwt.sign(datatotoken,process.env.JWT_KEY ,{expiresIn:'30d'});
@@ -129,16 +163,13 @@ router.post('/login',async(req,res)=>{
                     token:token,
                     
                 })
-            }
-            else{
+            }else{
                 return res.status(401).json({
                     message:"not the right password"
                     
                 })
             }
-        }
-    
-        else{
+        }else{
             return res.status(200).json({
                 message:"user not found"
                 
@@ -161,8 +192,10 @@ router.post('/login',async(req,res)=>{
 
 
 router.get('/getData' , Auth  , async(req,res)=>{
+
+    const user =req.user;
     return res.status(200).json({
-        message:"OK "+req.newdata,
+        message:user,
         
     })
 })

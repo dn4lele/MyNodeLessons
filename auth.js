@@ -1,5 +1,6 @@
 import  Jwt from "jsonwebtoken";
 import asynchandler from 'express-async-handler';
+import Account from "./models/account.js";
 
 const protect =asynchandler(async(req,res,next)=>{
     let token;
@@ -7,9 +8,10 @@ const protect =asynchandler(async(req,res,next)=>{
         try {
             token= req.headers.authorization.split(' ')[1];
             const decoded= await Jwt.verify(token,process.env.JWT_KEY);
-            //database next lesson
-
-            req.newdata='hello i an new data'
+            
+            const the_user=await Account.findByPk(decoded.id);
+            req.user=the_user
+            //req.newdata='hello i an new data'
             next();
 
         } catch (error) {
