@@ -7,6 +7,43 @@ import Account from "./models/account.js";
 import Products from './models/Products.js';
 
 
+//find all products of the user
+router.get('/getallproducts',Auth,(req,res)=>{
+    const user =req.user;
+
+    Products.findAll({where:{publisherId:user.id}})
+    .then(Products=>{
+        return res.status(200).json({
+            data:Products
+        })
+
+    }).catch(error=>{
+        return res.status(200).json({
+            message:error.message
+        })
+
+    })
+})
+
+
+//find by id
+router.get('/findbyid/:pid',(req,res)=>{
+    const productid=req.params.pid
+    Products.findByPk(productid)
+    .then(Products=>{
+        return res.status(200).json({
+            data:Products
+        })
+
+    }).catch(error=>{
+        return res.status(200).json({
+            message:error.message
+        })
+
+    })
+})
+
+
 
 router.post('/shop' , Auth  , async(req,res)=>{
 
