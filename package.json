@@ -1,7 +1,6 @@
 {
   "name": "mynodelessons",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -20,5 +19,7 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
-  }
+  },
+  "keywords": [],
+  "description": ""
 }
